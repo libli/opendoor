@@ -11,25 +11,18 @@ import (
 
 // FirewallHandler is the handler for the firewall.
 type FirewallHandler struct {
-	Token   string
 	Servers []config.Server
 }
 
 // NewFirewallHandler creates a new FirewallHandler.
-func NewFirewallHandler(token string, servers []config.Server) *FirewallHandler {
+func NewFirewallHandler(servers []config.Server) *FirewallHandler {
 	return &FirewallHandler{
-		Token:   token,
 		Servers: servers,
 	}
 }
 
-// Update is the handler for the firewall.
-func (h *FirewallHandler) Update(c *gin.Context) {
-	token := c.Query("token")
-	if token != h.Token {
-		response.Forbidden(c, "Unauthorized", nil)
-		return
-	}
+// Create 添加新的防火墙规则.
+func (h *FirewallHandler) Create(c *gin.Context) {
 	clientIP := c.ClientIP()
 	log.Info("收到新请求", zap.String("ip", clientIP))
 	response.Success(c, gin.H{"ip": clientIP})
