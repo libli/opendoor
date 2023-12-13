@@ -25,6 +25,16 @@ func Success(c *gin.Context, data interface{}) {
 	})
 }
 
+// Error 错误响应
+func Error(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, APIResponse{
+		RequestID: requestid.Get(c),
+		Code:      1,
+		Message:   "error",
+		Data:      data,
+	})
+}
+
 // Forbidden 禁止响应
 func Forbidden(c *gin.Context, message string, data interface{}) {
 	c.JSON(http.StatusForbidden, APIResponse{

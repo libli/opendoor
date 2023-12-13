@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"opendoor/config"
+	"opendoor/application"
 	"opendoor/interfaces/response"
 	"opendoor/log"
 
@@ -11,22 +11,26 @@ import (
 
 // FirewallHandler is the handler for the firewall.
 type FirewallHandler struct {
-	Servers []config.Server
+	firewallApp application.IFirewallApp
 }
 
 // NewFirewallHandler creates a new FirewallHandler.
-func NewFirewallHandler(servers []config.Server) *FirewallHandler {
+func NewFirewallHandler(app application.IFirewallApp) *FirewallHandler {
 	return &FirewallHandler{
-		Servers: servers,
+		firewallApp: app,
 	}
 }
 
 // Create 添加新的防火墙规则.
 func (h *FirewallHandler) Create(c *gin.Context) {
 	clientIP := c.ClientIP()
-	log.Info("收到新请求", zap.String("ip", clientIP))
-	response.Success(c, gin.H{"ip": clientIP})
 
-	////firewall.CreateRule(h.hkClient)
-	//fmt.Fprintf(w, "您的 IP 地址是: %s\n", userIP)
+	if err := h.firewallApp.Add(c, clientIP); err != nil {
+		log.Error("添加防火墙规则失败", zap.Error(err))
+		response.Error(c, err)
+		return
+	}
+
+	log.Info("添加防火墙规则成功", zap.String("ip", clientIP))
+	response.Success(c, nil)
 }

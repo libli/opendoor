@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"opendoor/config"
+	"opendoor/infrastructure/persistence"
 	"opendoor/interfaces"
 	"opendoor/log"
 
@@ -42,8 +43,12 @@ func main() {
 	}))
 	r.Use(ginzap.RecoveryWithZap(log.Logger(), true))
 
+	repo, err := persistence.NewRepositories(cfg.Servers)
+	if err != nil {
+		log.Fatal("create repositories error", zap.Error(err))
+	}
 	// 设置路由
-	interfaces.SetupRouter(r, cfg)
+	interfaces.SetupRouter(r, repo, cfg.Token)
 
 	// 启动服务
 	if err := r.Run(":" + cfg.Gin.Port); err != nil {

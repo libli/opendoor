@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Auth 鉴权中间件
 func Auth(token string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userToken := c.GetHeader("Authorization")
